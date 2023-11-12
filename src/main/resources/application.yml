@@ -1,0 +1,23 @@
+---
+server.http2.enabled: true
+app:
+  appName: "Online Mancala Game"
+
+spring:
+  main:
+    banner-mode: console
+    banner:
+      location: classpath:banner.txt
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://${DB_HOST:localhost}/${DB_NAME:mancala}"
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    hikari:
+      minimumIdle: 1
+      maximumPoolSize: 5
+      connectionTimeout: 15000
+      validationTimeout: 1000
+
+logging:
+  config: classpath:logback-spring.xml
