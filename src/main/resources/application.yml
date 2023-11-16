@@ -9,8 +9,8 @@ spring:
     banner:
       location: classpath:banner.txt
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://${DB_HOST:localhost}/${DB_NAME:mancala}"
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgres://${DB_HOST}/${DB_NAME}"
     username: ${DB_USER}
     password: ${DB_PASS}
     hikari:
