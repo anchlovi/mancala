@@ -41,6 +41,10 @@ class BoardTest {
     fun `should correctly calculate opposite pit index`() {
         assertEquals(12, board.getOppositePitIndex(0))
         assertEquals(2, board.getOppositePitIndex(10))
+
+        // bug reproduced
+        val buggedBoard = Board(listOf(2, 2, 0, 2, 2, 0), 2)
+        assertEquals(0, buggedBoard.getOppositePitIndex(4))
     }
 
     @Test

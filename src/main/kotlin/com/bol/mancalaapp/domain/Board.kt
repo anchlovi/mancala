@@ -60,7 +60,7 @@ data class Board(
      * @return The index of the opposite pit.
      */
     fun getOppositePitIndex(pitIdx: Int): Int {
-        val currentRow = pitIdx / pitsPerRow
+        val currentRow = pitIdx / (pitsPerRow + 1)
         val totalRows = pits.size / (pitsPerRow + 1)
         val oppositeRow = (currentRow + 1) % totalRows
 
