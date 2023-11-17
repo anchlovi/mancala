@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
  * he game is considered over if all pits are empty for all but one player.
  */
 @Component
-@Order(40)
+@Order(30)
 object GameOverGameRule : GameRule {
     override fun apply(ctx: GameContext): GameContext {
         if (isGameOver(ctx)) {
