@@ -64,6 +64,18 @@ class GameOverGameRuleTest {
         assertSame(ctx, newCtx)
     }
 
+    @Test
+    fun `should end game if all pits for all players are empty`() {
+        val pits = listOf(0, 0, 2, 0, 0, 6)
+        val ctx = GamesHelper.newGameContext()
+            .withBoard(Board(pits, pitsPerRow = 2))
+            .withGameState(GameState.IN_PROGRESS)
+
+        val newCtx = rule.apply(ctx)
+
+        assertEquals(GameState.GAME_OVER, newCtx.gameState())
+    }
+
     companion object {
         val pitsForPlayer = (4..6).random()
 

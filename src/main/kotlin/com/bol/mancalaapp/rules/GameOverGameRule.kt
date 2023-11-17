@@ -32,7 +32,7 @@ object GameOverGameRule : GameRule {
         (0 until ctx.game.totalPlayers)
             .map { ctx.board().getPitsInRow(it).all { p -> p == 0 } }
             .filter { it }
-            .size == ctx.game.totalPlayers - 1
+            .size >= ctx.game.totalPlayers - 1
 
     private fun determineWinner(board: Board, totalPlayers: Int): Int? {
         val scores = (0 until totalPlayers).associateWith {
