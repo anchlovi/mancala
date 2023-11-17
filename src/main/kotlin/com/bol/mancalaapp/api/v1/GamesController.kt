@@ -2,10 +2,10 @@ package com.bol.mancalaapp.api.v1
 
 import com.bol.mancalaapp.GameId
 import com.bol.mancalaapp.api.v1.requests.CreateNewGameRequest
+import com.bol.mancalaapp.api.v1.requests.PlayRequest
 import com.bol.mancalaapp.api.v1.responses.GameResponse
 import com.bol.mancalaapp.usecases.create.CreateNewGameUseCase
 import com.bol.mancalaapp.usecases.find.FindGameByIdUseCase
-import com.bol.mancalaapp.usecases.play.PlayCommand
 import com.bol.mancalaapp.usecases.play.PlayUseCase
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
@@ -52,12 +52,10 @@ class GamesController(
     /**
      * Endpoint for playing a move in a game.
      *
-     * @param gameId The unique identifier of the game in which the move is played.
-     * @param pitIdx The index of the pit from which the move is initiated.
-     * @param version The version of the game for optimistic locking.
+     * @param playRequest The request body containing the parameters for the move.
      * @return A [CompletionStage] with [GameResponse] representing the updated state of the game after the move.
      */
-    @PutMapping("/{gameId}/play/{pitIdx}")
-    fun play(@PathVariable gameId: GameId, @PathVariable pitIdx: Int, @RequestParam(required = true) version: Int): CompletionStage<GameResponse> =
-        playUseCase.play(PlayCommand(gameId, pitIdx, version)).thenApply { GameResponse.fromGame(it) }
+    @PutMapping
+    fun play(@RequestBody playRequest: PlayRequest): CompletionStage<GameResponse> =
+        playUseCase.play(playRequest.toCommand()).thenApply { GameResponse.fromGame(it) }
 }

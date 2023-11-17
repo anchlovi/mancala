@@ -3,14 +3,15 @@ package com.bol.mancalaapp.api.v1
 import com.bol.mancalaapp.GameId
 import com.bol.mancalaapp.api.v1.exceptions.ErrorResponse
 import com.bol.mancalaapp.api.v1.requests.CreateNewGameRequest
+import com.bol.mancalaapp.api.v1.requests.PlayRequest
 import com.bol.mancalaapp.config.JacksonConfig
 import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GameNotFoundException
 import com.bol.mancalaapp.domain.VersionMismatchException
 import com.bol.mancalaapp.helpers.GamesHelper
+import com.bol.mancalaapp.rules.validators.ValidationException
 import com.bol.mancalaapp.usecases.create.CreateNewGameUseCase
 import com.bol.mancalaapp.usecases.find.FindGameByIdUseCase
-import com.bol.mancalaapp.usecases.play.PlayCommand
 import com.bol.mancalaapp.usecases.play.PlayUseCase
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
@@ -23,7 +24,10 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.*
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.ResultActions
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.concurrent.CompletableFuture
@@ -92,12 +96,12 @@ class GamesControllerTest {
 
     @Test
     fun `play should return 200 when move is valid`() {
-        val command = PlayCommand(game.id, 1, game.version)
+        val request = PlayRequest(game.id, 1, game.version)
 
-        whenever(playUseCase.play(command))
+        whenever(playUseCase.play(request.toCommand()))
             .thenReturn(CompletableFuture.completedStage(game))
 
-        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(command)))
+        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(request)))
             .andExpect(MockMvcResultMatchers.status().isOk)
 
         assertGameProperties(results, game)
@@ -105,22 +109,32 @@ class GamesControllerTest {
 
     @Test
     fun `play should return 404 when game is not found`() {
-        val command = PlayCommand(game.id, 1, 1)
+        val request = PlayRequest(game.id, 1, 1)
 
-        whenever(playUseCase.play(command))
-            .thenReturn(CompletableFuture.failedStage(GameNotFoundException(command.gameId)))
+        whenever(playUseCase.play(request.toCommand()))
+            .thenReturn(CompletableFuture.failedStage(GameNotFoundException(request.gameId)))
 
-        assertGameWasNotFound(play(command), command.gameId)
+        assertGameWasNotFound(play(request), request.gameId)
     }
 
     @Test
     fun `play should return 429 on game version conflicts`() {
-        val command = PlayCommand(game.id, 1, 1)
+        val request = PlayRequest(game.id, 1, 1)
 
-        whenever(playUseCase.play(command))
+        whenever(playUseCase.play(request.toCommand()))
             .thenReturn(CompletableFuture.failedStage(VersionMismatchException()))
 
-        assertVersionMismatch(play(command))
+        assertVersionMismatch(play(request))
+    }
+
+    @Test
+    fun `play should return 400 on invalid move`() {
+        val request = PlayRequest(game.id, 1, 1)
+
+        whenever(playUseCase.play(request.toCommand()))
+            .thenReturn(CompletableFuture.failedStage(ValidationException("some failure message")))
+
+        assertBadRequest(play(request))
     }
 
     private fun createNewGame(body: CreateNewGameRequest): MvcResult {
@@ -136,8 +150,13 @@ class GamesControllerTest {
         return mockMvc.get("${GAMES_URI}/${gameId}").andReturn()
     }
 
-    private fun play(cmd: PlayCommand): MvcResult =
-        mockMvc.put("${GAMES_URI}/${cmd.gameId}/play/${cmd.pitIdx}?version=${cmd.version}").andReturn()
+    private fun play(body: PlayRequest): MvcResult =
+        mockMvc.perform(
+            MockMvcRequestBuilders.put(GAMES_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body))
+                .characterEncoding("utf-8")
+        ).andReturn()
 
     private fun assertGameWasNotFound(mvcResult: MvcResult, gameId: GameId) =
         assertError(
@@ -156,6 +175,16 @@ class GamesControllerTest {
             expectedError = ErrorResponse(
                 type = VersionMismatchException::class.qualifiedName,
                 message = "Version mismatch"
+            )
+        )
+
+    private fun assertBadRequest(mvcResult: MvcResult) =
+        assertError(
+            mvcResult = mvcResult,
+            expectedStatus = HttpStatus.BAD_REQUEST,
+            expectedError = ErrorResponse(
+                type = ValidationException::class.qualifiedName,
+                message = "some failure message"
             )
         )
 
