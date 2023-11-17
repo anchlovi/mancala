@@ -1,6 +1,5 @@
 package com.bol.mancalaapp.rules.validators
 
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import com.bol.mancalaapp.rules.GameContext
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -17,7 +16,7 @@ class PitIsMancalaValidatorTest {
     @BeforeEach
     fun setUp() {
         gameContext = GamesHelper.newGameContext()
-        mancalaPitIndex = gameContext.getPlayerMancalaIndex(player = Player.entries.toTypedArray().random())
+        mancalaPitIndex = gameContext.getPlayerMancalaIndex(player = 1)
         notMancalaPitIndex = mancalaPitIndex - 1
     }
 

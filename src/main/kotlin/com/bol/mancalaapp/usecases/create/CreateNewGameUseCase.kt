@@ -1,7 +1,10 @@
 package com.bol.mancalaapp.usecases.create
 
 import com.bol.mancalaapp.GameId
-import com.bol.mancalaapp.domain.*
+import com.bol.mancalaapp.domain.Board
+import com.bol.mancalaapp.domain.Game
+import com.bol.mancalaapp.domain.GameState
+import com.bol.mancalaapp.domain.GamesRepository
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletionStage
 
@@ -36,7 +39,8 @@ class CreateNewGameUseCase(
     private fun createGame(command: CreateNewGameCommand): Game = Game(
         id = GameId.randomUUID(),
         board = createBoard(command),
-        currentPlayer = Player.PLAYER1,
+        totalPlayers = command.totalPlayers,
+        currentPlayer = 0,
         gameState = GameState.IN_PROGRESS,
         winner = null,
         version = 0

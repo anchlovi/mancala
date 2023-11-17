@@ -3,7 +3,6 @@ package com.bol.mancalaapp.rules
 import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GameState
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -37,12 +36,12 @@ class GameContextTest {
     fun `should correctly return isPitOwnedByCurrentPlayer`() {
         val pitIdx = 2
 
-        assertEquals(board.isPitInRow(game.currentPlayer.ordinal, pitIdx), gameContext.isPitOwnedByCurrentPlayer(pitIdx))
+        assertEquals(board.isPitInRow(game.currentPlayer, pitIdx), gameContext.isPitOwnedByCurrentPlayer(pitIdx))
     }
 
     @Test
     fun `should correctly return getPlayerMancalaIndex`() {
-        assertEquals(board.getRowMancalaPit(game.currentPlayer.ordinal), gameContext.getPlayerMancalaIndex())
+        assertEquals(board.getRowMancalaPit(game.currentPlayer), gameContext.getPlayerMancalaIndex())
     }
 
     @Test
@@ -52,7 +51,7 @@ class GameContextTest {
 
     @Test
     fun `should correctly return withPlayer`() {
-        val newPlayer = game.currentPlayer.opponent
+        val newPlayer = game.currentPlayer
 
         // Assert
         assertEquals(newPlayer, gameContext.withPlayer(newPlayer).player())
@@ -60,7 +59,7 @@ class GameContextTest {
 
     @Test
     fun `should correctly return withWinner`() {
-        val newWinner = Player.PLAYER1
+        val newWinner = 5
 
         assertEquals(newWinner, gameContext.withWinner(newWinner).game.winner)
         assertNull(gameContext.withWinner(null).game.winner)

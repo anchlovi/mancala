@@ -1,7 +1,6 @@
 package com.bol.mancalaapp.rules
 
 import com.bol.mancalaapp.domain.Board
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.Test
 class DistributeStonesGameRuleTest {
 
     private val rule = DistributeStonesGameRule
-    private val gameContext = GamesHelper.newGameContext().withPlayer(Player.PLAYER1)
+    private val gameContext = GamesHelper.newGameContext().withPlayer(0)
 
     @Test
     fun `should distribute stones counterclockwise around the board skipping opponent Mancala when selected pit has stones`() {
@@ -33,7 +32,7 @@ class DistributeStonesGameRuleTest {
         pits.indices.forEach {
             val expectedStones = when(it) {
                 pitIdx -> 1 // assert wrapped around board and distributed 1 stone to pit 0
-                ctx.getPlayerMancalaIndex(Player.PLAYER2) -> player2Mancala // assert skipped opponent Mancala
+                ctx.getPlayerMancalaIndex(1) -> player2Mancala // assert skipped opponent Mancala
                 else -> pits[it] + 1 // assert distributed 1 stone to each pit
             }
             assertEquals(expectedStones, newCtx.board().getStones(it))

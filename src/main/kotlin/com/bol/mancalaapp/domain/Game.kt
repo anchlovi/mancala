@@ -19,26 +19,11 @@ enum class GameState {
 }
 
 /**
- * Represents the players in the Mancala game.
- */
-enum class Player {
-    PLAYER1,
-    PLAYER2;
-
-    /**
-     * Gets the opponent of the current player.
-     *
-     * @return The opponent player.
-     */
-    val opponent: Player
-        get() = if (this == PLAYER1) PLAYER2 else PLAYER1
-}
-
-/**
  * Represents a game of Mancala, encapsulating all relevant game details.
  *
  * @property id Unique identifier for the game.
  * @property board The current state of the game board.
+ * @property totalPlayers The total number of players in the game.
  * @property currentPlayer The player who is currently making a move.
  * @property gameState The current state of the game (in progress or game over).
  * @property winner The player who has won the game, if applicable. Null if the game is still in progress or if it's a draw.
@@ -47,8 +32,16 @@ enum class Player {
 data class Game(
     val id: GameId,
     val board: Board,
-    val currentPlayer: Player,
+    val totalPlayers: Int,
+    val currentPlayer: Int,
     val gameState: GameState,
-    val winner: Player?,
+    val winner: Int?,
     val version: Int
-)
+) {
+    /**
+     * Calculates the next player's turn in the game.
+     *
+     * @return The number of the next player.
+     */
+    fun nextPlayer() = (currentPlayer + 1) % totalPlayers
+}

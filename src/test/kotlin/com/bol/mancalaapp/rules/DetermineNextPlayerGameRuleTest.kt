@@ -24,6 +24,6 @@ class DetermineNextPlayerGameRuleTest {
 
         val newCtx = rule.apply(ctx)
 
-        assertEquals(gameContext.player().opponent, newCtx.player())
+        assertEquals(gameContext.game.nextPlayer(), newCtx.player())
     }
 }

@@ -14,12 +14,13 @@ import java.util.*
  * @property winner The player who won the game, null if the game is still in progress or if it's a draw.
  * @property version The version of the game state, used for optimistic locking.
  */
-data class GameResponse (
+data class GameResponse(
     val id: UUID,
     val board: BoardResponse,
-    val currentPlayer: String,
+    val totalPlayers: Int,
+    val currentPlayer: Int,
     val gameState: String,
-    val winner: String? = null,
+    val winner: Int? = null,
     val version: Int
 ) {
     companion object {
@@ -36,9 +37,10 @@ data class GameResponse (
             return GameResponse(
                 id = game.id,
                 board = BoardResponse.fromBoard(game.board),
-                currentPlayer = game.currentPlayer.name,
+                totalPlayers = game.totalPlayers,
+                currentPlayer = game.currentPlayer,
                 gameState = game.gameState.name,
-                winner = game.winner?.name,
+                winner = game.winner,
                 version = game.version
             )
         }

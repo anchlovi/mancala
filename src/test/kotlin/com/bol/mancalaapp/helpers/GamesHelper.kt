@@ -4,7 +4,6 @@ import com.bol.mancalaapp.GameId
 import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GameState
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.rules.GameContext
 
 object GamesHelper {
@@ -17,9 +16,10 @@ object GamesHelper {
         return Game(
             id = GameId.randomUUID(),
             board = newBoard(),
-            currentPlayer = Player.entries.toTypedArray().random(),
+            totalPlayers = 2,
+            currentPlayer = 0,
             gameState = GameState.entries.toTypedArray().random(),
-            winner = if (Math.random() > 0.5) Player.entries.toTypedArray().random() else null,
+            winner = if (Math.random() > 0.5) 0 else null,
             version = 0
         )
     }

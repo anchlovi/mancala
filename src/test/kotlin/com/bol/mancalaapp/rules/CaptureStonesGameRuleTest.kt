@@ -1,7 +1,6 @@
 package com.bol.mancalaapp.rules
 
 import com.bol.mancalaapp.domain.Board
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +32,7 @@ class CaptureStonesGameRuleTest {
         )
 
         ctx = GamesHelper.newGameContext()
-            .withPlayer(Player.PLAYER1)
+            .withPlayer(0)
             .withBoard(board = Board(pits, pitsPerRow = 4))
     }
 

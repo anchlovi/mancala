@@ -3,7 +3,6 @@ package com.bol.mancalaapp.rules
 import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GameState
-import com.bol.mancalaapp.domain.Player
 
 data class GameContext(
     val game: Game,
@@ -26,14 +25,14 @@ data class GameContext(
      *
      * @param player The player whose Mancala pit index is to be retrieved. Defaults to the current player.
      */
-    fun getPlayerMancalaIndex(player: Player = player()) = board().getRowMancalaPit(player.ordinal)
+    fun getPlayerMancalaIndex(player: Int = player()) = board().getRowMancalaPit(player)
 
     /**
      * Checks if a pit is owned by the current player.
      *
      * @param pitIdx The index of the pit.
      */
-    fun isPitOwnedByCurrentPlayer(pitIdx: Int) = board().isPitInRow(player().ordinal, pitIdx)
+    fun isPitOwnedByCurrentPlayer(pitIdx: Int) = board().isPitInRow(player(), pitIdx)
 
     /**
      * Returns the current game status.
@@ -44,9 +43,9 @@ data class GameContext(
 
     fun withBoard(board: Board) = copy(game = game.copy(board = board))
 
-    fun withPlayer(player: Player) = copy(game = game.copy(currentPlayer = player))
+    fun withPlayer(player: Int) = copy(game = game.copy(currentPlayer = player))
 
-    fun withWinner(player: Player?) = copy(game = game.copy(winner = player))
+    fun withWinner(player: Int?) = copy(game = game.copy(winner = player))
 
     fun withGameState(gameState: GameState) = copy(game = game.copy(gameState = gameState))
 

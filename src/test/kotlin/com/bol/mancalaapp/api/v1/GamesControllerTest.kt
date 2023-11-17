@@ -173,9 +173,10 @@ class GamesControllerTest {
             MockMvcResultMatchers.jsonPath("$.id").value(expectedGame.id.toString()),
             MockMvcResultMatchers.jsonPath("$.board.pits").value(expectedGame.board.pits),
             MockMvcResultMatchers.jsonPath("$.board.pits_for_player").value(expectedGame.board.pitsPerRow),
-            MockMvcResultMatchers.jsonPath("$.current_player").value(expectedGame.currentPlayer.name),
+            MockMvcResultMatchers.jsonPath("$.total_players").value(expectedGame.totalPlayers),
+            MockMvcResultMatchers.jsonPath("$.current_player").value(expectedGame.currentPlayer),
             MockMvcResultMatchers.jsonPath("$.game_state").value(expectedGame.gameState.name),
-            MockMvcResultMatchers.jsonPath("$.winner").value(expectedGame.winner?.name),
+            MockMvcResultMatchers.jsonPath("$.winner").value(expectedGame.winner),
             MockMvcResultMatchers.jsonPath("$.version").value(expectedGame.version)
         )
     }

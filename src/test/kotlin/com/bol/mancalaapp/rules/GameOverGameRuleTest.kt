@@ -2,7 +2,6 @@ package com.bol.mancalaapp.rules
 
 import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.domain.GameState
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -34,8 +33,8 @@ class GameOverGameRuleTest {
 
         val newCtx = rule.apply(ctx)
 
-        assertTrue(newCtx.board().getPitsInRow(Player.PLAYER1.ordinal).all { it == 0 })
-        assertTrue(newCtx.board().getPitsInRow(Player.PLAYER2.ordinal).all { it == 0 })
+        assertTrue(newCtx.board().getPitsInRow(0).all { it == 0 })
+        assertTrue(newCtx.board().getPitsInRow(1).all { it == 0 })
     }
 
     @ParameterizedTest
@@ -47,11 +46,11 @@ class GameOverGameRuleTest {
 
         val newCtx = rule.apply(ctx)
 
-        val expectedPlayer1Score = ctx.board().getPitsInRow(Player.PLAYER1.ordinal).sum() + player1MancalaStones
-        val expectedPlayer2Score = ctx.board().getPitsInRow(Player.PLAYER2.ordinal).sum() + player2MancalaStones
+        val expectedPlayer1Score = ctx.board().getPitsInRow(0).sum() + player1MancalaStones
+        val expectedPlayer2Score = ctx.board().getPitsInRow(1).sum() + player2MancalaStones
 
-        assertEquals(expectedPlayer1Score, newCtx.board().getStones(newCtx.getPlayerMancalaIndex(Player.PLAYER1)))
-        assertEquals(expectedPlayer2Score, newCtx.board().getStones(newCtx.getPlayerMancalaIndex(Player.PLAYER2)))
+        assertEquals(expectedPlayer1Score, newCtx.board().getStones(newCtx.getPlayerMancalaIndex(0)))
+        assertEquals(expectedPlayer2Score, newCtx.board().getStones(newCtx.getPlayerMancalaIndex(1)))
     }
 
     @Test

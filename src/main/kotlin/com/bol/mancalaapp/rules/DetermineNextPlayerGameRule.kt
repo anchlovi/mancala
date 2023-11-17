@@ -15,6 +15,6 @@ object DetermineNextPlayerGameRule : GameRule {
     override fun apply(ctx: GameContext): GameContext =
         when (ctx.lastPitIdx) {
             ctx.getPlayerMancalaIndex() -> ctx
-            else -> ctx.withPlayer(ctx.player().opponent)
+            else -> ctx.withPlayer(ctx.game.nextPlayer())
     }
 }

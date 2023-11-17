@@ -37,7 +37,7 @@ class PlayUseCaseTest {
 
     @Test
     fun `play should update the game state correctly`(): Unit = runBlocking {
-        val updatedGame = game.copy(currentPlayer = game.currentPlayer.opponent)
+        val updatedGame = game.copy(currentPlayer = game.nextPlayer())
         val gameContext = GameContext(game, pitIndex)
         val updatedGameContext = gameContext.copy(game = updatedGame)
 

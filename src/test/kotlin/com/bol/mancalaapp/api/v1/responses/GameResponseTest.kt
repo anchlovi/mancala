@@ -14,9 +14,10 @@ class GameResponseTest {
 
         assertEquals(game.id, response.id)
         assertEquals(BoardResponse.fromBoard(game.board), response.board)
-        assertEquals(game.currentPlayer.name, response.currentPlayer)
+        assertEquals(game.totalPlayers, response.totalPlayers)
+        assertEquals(game.currentPlayer, response.currentPlayer)
         assertEquals(game.gameState.name, response.gameState)
-        assertEquals(game.winner?.name, response.winner)
+        assertEquals(game.winner, response.winner)
         assertEquals(game.version, response.version)
     }
 }

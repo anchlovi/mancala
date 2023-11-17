@@ -1,6 +1,5 @@
 package com.bol.mancalaapp.rules.validators
 
-import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import com.bol.mancalaapp.rules.GameContext
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -15,7 +14,7 @@ class PitBelongsToPlayerValidatorTest {
     @BeforeEach
     fun setUp() {
         gameContext = GamesHelper.newGameContext()
-        gameContext = gameContext.copy(game = gameContext.game.copy(currentPlayer = Player.PLAYER1))
+        gameContext = gameContext.copy(game = gameContext.game.copy(currentPlayer = 0))
     }
 
     @Test

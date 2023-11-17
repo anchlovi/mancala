@@ -48,7 +48,7 @@ abstract class GamesRepositoryContractTest {
         val game = GamesHelper.newGame().copy(version = 0)
         gamesRepository.create(game).asDeferred().await()
 
-        val updatedGame = game.copy(currentPlayer = game.currentPlayer.opponent)
+        val updatedGame = game.copy(currentPlayer = game.nextPlayer())
         gamesRepository.update(updatedGame).asDeferred().await()
 
         val retrievedGame = gamesRepository.findById(game.id).asDeferred().await()
