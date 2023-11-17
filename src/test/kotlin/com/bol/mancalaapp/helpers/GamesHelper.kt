@@ -38,7 +38,8 @@ object GamesHelper {
         }
 
         return Board(
-            pits = pits
+            pits = pits,
+            pitsPerRow = pitsForPlayer
         )
     }
 

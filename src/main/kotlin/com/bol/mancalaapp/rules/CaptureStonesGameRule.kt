@@ -13,24 +13,23 @@ import org.springframework.stereotype.Component
 object CaptureStonesGameRule : GameRule {
     override fun apply(ctx: GameContext): GameContext {
         if (captureRuleMet(ctx)) {
-            val opponentPitIdx = ctx.getOppositePitIndex(ctx.lastPitIdx)
-
+            val opponentPitIdx = ctx.board().getOppositePitIndex(ctx.lastPitIdx)
             val mancalaIdx = ctx.getPlayerMancalaIndex()
-            val pits = ctx.pits().toMutableList()
 
-            pits[mancalaIdx] += pits[opponentPitIdx] + 1
-            pits[opponentPitIdx] = 0
-            pits[ctx.lastPitIdx] = 0
 
-            return ctx.withPits(pits)
+            val updatedBoard = ctx.board()
+                .moveStones(opponentPitIdx, mancalaIdx)
+                .moveStones(ctx.lastPitIdx, mancalaIdx)
+
+            return ctx.withBoard(updatedBoard)
         }
 
         return ctx
     }
 
     private fun captureRuleMet(ctx: GameContext): Boolean =
-        ctx.getStonesInPit(ctx.lastPitIdx) == 1 &&
-                ctx.getStonesInPit(ctx.getOppositePitIndex(ctx.lastPitIdx)) > 0 &&
+        ctx.board().getStones(ctx.lastPitIdx) == 1 &&
+                ctx.board().getStones(ctx.board().getOppositePitIndex(ctx.lastPitIdx)) > 0 &&
                 ctx.isPitOwnedByCurrentPlayer(ctx.lastPitIdx) &&
                 ctx.getPlayerMancalaIndex() != ctx.lastPitIdx
 }

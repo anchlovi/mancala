@@ -1,5 +1,6 @@
 package com.bol.mancalaapp.rules
 
+import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.domain.Player
 import com.bol.mancalaapp.helpers.GamesHelper
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -25,7 +26,7 @@ class DistributeStonesGameRuleTest {
         val pits = listOf(pit0Stones, pit1Stones, player1Mancala, pit3Stones, pit4Stones, player2Mancala)
         val pitIdx = 0
 
-        val ctx = gameContext.copy(pitIdx = pitIdx).withPits(pits)
+        val ctx = gameContext.copy(pitIdx = pitIdx).withBoard(board = Board(pits, pitsPerRow = 2))
 
         val newCtx = rule.apply(ctx)
 
@@ -35,7 +36,7 @@ class DistributeStonesGameRuleTest {
                 ctx.getPlayerMancalaIndex(Player.PLAYER2) -> player2Mancala // assert skipped opponent Mancala
                 else -> pits[it] + 1 // assert distributed 1 stone to each pit
             }
-            assertEquals(expectedStones, newCtx.getStonesInPit(it))
+            assertEquals(expectedStones, newCtx.board().getStones(it))
         }
     }
 
@@ -44,7 +45,7 @@ class DistributeStonesGameRuleTest {
         val pits = listOf(0, 1, 2, 3, 4, 5)
         val pitIdx = 0
 
-        val ctx = gameContext.copy(pitIdx = pitIdx).withPits(pits)
+        val ctx = gameContext.copy(pitIdx = pitIdx).withBoard(board = Board(pits, pitsPerRow = 2))
 
         val newCtx = rule.apply(ctx)
 

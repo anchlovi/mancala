@@ -17,29 +17,33 @@ import org.springframework.stereotype.Component
 @Order(10)
 object DistributeStonesGameRule : GameRule {
     override fun apply(ctx: GameContext): GameContext {
-        if (ctx.getStonesInPit(ctx.pitIdx) == 0) {
+        if (ctx.board().getStones(ctx.pitIdx) == 0) {
             return ctx
         }
 
-        val pits = ctx.pits().toMutableList()
-        val opponentMancalaIdx = ctx.getPlayerMancalaIndex(ctx.player().opponent)
+        val mancalaIdx = ctx.getPlayerMancalaIndex()
         var currentPitIdx = ctx.pitIdx
 
-        var stonesToDistribute = pits[ctx.pitIdx]
-        pits[ctx.pitIdx] = 0
+        var stonesToDistribute = ctx.board().getStones(ctx.pitIdx)
+
+        val pits = mutableListOf<Int>()
 
         while (stonesToDistribute > 0) {
-            currentPitIdx = (currentPitIdx + 1) % pits.size
+            currentPitIdx = (currentPitIdx + 1) % ctx.board().getTotalPits()
 
-            if (currentPitIdx == opponentMancalaIdx) {
+            if (ctx.board().isMancalaPit(currentPitIdx) && currentPitIdx != mancalaIdx) {
                 continue
             }
 
-            pits[currentPitIdx] += 1
+            pits.add(currentPitIdx)
             stonesToDistribute -= 1
         }
 
-        return ctx.withPits(pits)
+        val updatedBoard = ctx.board()
+            .emptyPit(ctx.pitIdx)
+            .addStoneToPits(pits)
+
+        return ctx.withBoard(updatedBoard)
             .withLastPitIdx(currentPitIdx)
     }
 }

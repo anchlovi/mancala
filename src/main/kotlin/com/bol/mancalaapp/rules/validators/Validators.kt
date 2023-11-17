@@ -1,6 +1,5 @@
 package com.bol.mancalaapp.rules.validators
 
-import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.rules.GameContext
 import org.springframework.stereotype.Component
 
@@ -29,7 +28,7 @@ object EmptyPitValidator : PlayerMoveValidator {
      * @throws PitHasNoStonesException If the selected pit has no stones.
      */
     override fun validate(ctx: GameContext) {
-        if (ctx.getStonesInPit(ctx.pitIdx) == 0) {
+        if (ctx.board().getStones(ctx.pitIdx) == 0) {
             throw PitHasNoStonesException(ctx.pitIdx)
         }
     }
@@ -47,7 +46,7 @@ object PitIsMancalaValidator : PlayerMoveValidator {
      * @throws PitIsMancalaException If the selected pit is a Mancala pit.
      */
     override fun validate(ctx: GameContext) {
-        if (Board.isMancalaPit(ctx.pitIdx, ctx.pitsForPlayer())) {
+        if (ctx.game.board.isMancalaPit(ctx.pitIdx)) {
             throw PitIsMancalaException(ctx.pitIdx)
         }
     }
@@ -65,7 +64,7 @@ object PitBelongsToPlayerValidator : PlayerMoveValidator {
      * @throws PitDoesNotBelongToPlayerException If the pit does not belong to the current player.
      */
     override fun validate(ctx: GameContext) {
-        if (ctx.isPitNotOwnedByCurrentPlayer(ctx.pitIdx)) {
+        if (ctx.isPitOwnedByCurrentPlayer(ctx.pitIdx).not()) {
             throw PitDoesNotBelongToPlayerException(ctx.pitIdx, ctx.player())
         }
     }
@@ -83,7 +82,7 @@ object PitIsValidValidator : PlayerMoveValidator {
      * @throws InvalidPitException If the pit index is out of range.
      */
     override fun validate(ctx: GameContext) {
-        if (ctx.pitIdx < 0 || ctx.pitIdx >= ctx.totalPits()) {
+        if (ctx.pitIdx < 0 || ctx.pitIdx >= ctx.board().getTotalPits()) {
             throw InvalidPitException(ctx.pitIdx)
         }
     }

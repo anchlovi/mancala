@@ -5,38 +5,102 @@ import org.junit.jupiter.api.Test
 
 class BoardTest {
 
-    @Test
-    fun `should correctly identify Mancala pit`() {
-        val pitsForPlayer = 6
+    private val pits = listOf(1, 2, 3, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0)
+    private val board = Board(pits, 6)
 
-        assertTrue(Board.isMancalaPit(6, pitsForPlayer))
-        assertTrue(Board.isNotMancalaPit(5, pitsForPlayer))
+    @Test
+    fun `should collect all stones into Mancalas`() {
+        val result = board.collectAllStones()
+
+        val expectedPits = listOf(0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 57)
+        assertEquals(expectedPits, result.pits)
     }
 
     @Test
-    fun `should correctly identify pit ownership`() {
-        val totalPits = 14
+    fun `should correctly identify Mancala pit`() {
+        assertTrue(board.isMancalaPit(6))
+        assertFalse(board.isMancalaPit(5))
+    }
 
-        assertTrue(Board.isPitOwnedByCurrentPlayer(Player.PLAYER1, 2, totalPits))
-        assertFalse(Board.isPitOwnedByCurrentPlayer(Player.PLAYER1, 10, totalPits))
+    @Test
+    fun `should correctly calculate Mancala pit for a row`() {
+        assertEquals(6, board.getRowMancalaPit(0))
+        assertEquals(13, board.getRowMancalaPit(1))
+    }
 
-        assertTrue(Board.isPitOwnedByCurrentPlayer(Player.PLAYER2, 9, totalPits))
-        assertFalse(Board.isPitOwnedByCurrentPlayer(Player.PLAYER2, 3, totalPits))
+    @Test
+    fun `should correctly identify if pit is in a row`() {
+        assertTrue(board.isPitInRow(0, 2))
+        assertFalse(board.isPitInRow(0, 8))
+
+        assertTrue(board.isPitInRow(1, 10))
+        assertFalse(board.isPitInRow(1, 3))
     }
 
     @Test
     fun `should correctly calculate opposite pit index`() {
-        val totalPits = 14
-
-        assertEquals(12, Board.getOppositePitIndex(totalPits, 0))
-        assertEquals(2, Board.getOppositePitIndex(totalPits, 10))
+        assertEquals(12, board.getOppositePitIndex(0))
+        assertEquals(2, board.getOppositePitIndex(10))
     }
 
     @Test
-    fun `should correctly return pits for player`() {
-        val pits = listOf(1, 2, 3, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0)
+    fun `should correctly return pits in a row`() {
+        assertEquals(listOf(1, 2, 3, 4, 5, 6), board.getPitsInRow(0))
+        assertEquals(listOf(7, 8, 9, 10, 11, 12), board.getPitsInRow(1))
+    }
 
-        assertEquals(listOf(1, 2, 3, 4, 5, 6), Board.getPitsForPlayer(Player.PLAYER1, pits))
-        assertEquals(listOf(7, 8, 9, 10, 11, 12), Board.getPitsForPlayer(Player.PLAYER2, pits))
+    @Test
+    fun `should correctly get stones in a pit`() {
+        assertEquals(1, board.getStones(0))
+        assertEquals(0, board.getStones(6))
+    }
+
+    @Test
+    fun `should add a stone to each specified pit`() {
+        val pitsToAddStone = listOf(1, 3, 5, 6, 12)
+
+        val result = board.addStoneToPits(pitsToAddStone)
+
+        val expectedPits = listOf(1, 3, 3, 5, 5, 7, 1, 7, 8, 9, 10, 11, 13, 0)
+        assertEquals(expectedPits, result.pits)
+    }
+
+    @Test
+    fun `should move all stones from one pit to another`() {
+        val result = board.moveStones(
+            fromPitIdx = 1,
+            toPitIdx = 3
+        )
+
+        val expectedPits = listOf(1, 0, 3, 6, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0)
+        assertEquals(expectedPits, result.pits)
+    }
+
+    @Test
+    fun `should empty the specified pit`() {
+        val result = board.emptyPit(1)
+
+        val expectedPits = listOf(1, 0, 3, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0)
+        assertEquals(expectedPits, result.pits)
+    }
+
+    @Test
+    fun `should correctly return total pits`() {
+        assertEquals(pits.size, board.getTotalPits())
+    }
+
+    @Test
+    fun `should create a new board with the specified configuration`() {
+        // Arrange
+        val totalRows = 2
+        val pitsPerRow = 6
+        val stonesPerPit = 4
+
+        // Act
+        val board = Board.createBoard(totalRows, pitsPerRow, stonesPerPit)
+
+        // Assert
+        val expectedPits = listOf(4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0)
+        assertEquals(expectedPits, board.pits)
     }
 }

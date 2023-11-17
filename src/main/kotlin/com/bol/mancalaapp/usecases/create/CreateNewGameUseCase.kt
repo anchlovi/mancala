@@ -49,16 +49,9 @@ class CreateNewGameUseCase(
      * @param command The command containing the settings for the new game's board.
      * @return A [Board] object representing the initial state of the game board.
      */
-    private fun createBoard(command: CreateNewGameCommand): Board {
-        val pitsList = List(command.totalNumberOfPits()) { index ->
-            when {
-                Board.isMancalaPit(index, command.numberOfPitsForPlayer) -> 0
-                else -> command.numberOfStonesInEachPit
-            }
-        }
-
-        return Board(
-            pits = pitsList
-        )
-    }
+    private fun createBoard(command: CreateNewGameCommand): Board = Board.createBoard(
+        totalRows = command.totalPlayers,
+        pitsPerRow = command.pitsForPlayer,
+        stonesPerPit = command.stonesPerPit
+    )
 }

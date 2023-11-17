@@ -57,8 +57,9 @@ class GamesControllerTest {
     @Test
     fun `create should return 201 when a new game is created`() {
         val request = CreateNewGameRequest(
-            numberOfPitsForPlayer = 4,
-            numberOfStonesInEachPit = 4,
+            totalPlayers = 2,
+            pitsForPlayer = 4,
+            stonesPerPit = 4,
         )
 
         whenever(createUseCase.createNewGame(request.toCommand()))
@@ -171,7 +172,7 @@ class GamesControllerTest {
         resultActions.andExpectAll(
             MockMvcResultMatchers.jsonPath("$.id").value(expectedGame.id.toString()),
             MockMvcResultMatchers.jsonPath("$.board.pits").value(expectedGame.board.pits),
-            MockMvcResultMatchers.jsonPath("$.board.pits_for_player").value(expectedGame.board.pitsForPlayer),
+            MockMvcResultMatchers.jsonPath("$.board.pits_for_player").value(expectedGame.board.pitsPerRow),
             MockMvcResultMatchers.jsonPath("$.current_player").value(expectedGame.currentPlayer.name),
             MockMvcResultMatchers.jsonPath("$.game_state").value(expectedGame.gameState.name),
             MockMvcResultMatchers.jsonPath("$.winner").value(expectedGame.winner?.name),

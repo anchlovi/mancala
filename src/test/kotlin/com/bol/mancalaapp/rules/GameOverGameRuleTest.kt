@@ -9,15 +9,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class DetermineGameStateGameRuleTest {
+class GameOverGameRuleTest {
 
-    private val rule = DetermineGameStateGameRule
+    private val rule = GameOverGameRule
 
     @ParameterizedTest
     @MethodSource("pitsProvider")
     fun `should end game and set correct status when all pits for a player are empty`(pits: List<Int>) {
         val ctx = GamesHelper.newGameContext()
-            .withPits(pits)
+            .withBoard(board = Board(pits, pitsPerRow = pitsForPlayer))
             .withGameState(GameState.IN_PROGRESS)
 
         val newCtx = rule.apply(ctx)
@@ -29,35 +29,35 @@ class DetermineGameStateGameRuleTest {
     @MethodSource("pitsProvider")
     fun `should end game and empty all pits when all pits for a player are empty`(pits: List<Int>) {
         val ctx = GamesHelper.newGameContext()
-            .withPits(pits)
+            .withBoard(Board(pits, pitsPerRow = pitsForPlayer))
             .withGameState(GameState.IN_PROGRESS)
 
         val newCtx = rule.apply(ctx)
 
-        assertTrue(Board.getPitsForPlayer(Player.PLAYER1, newCtx.pits()).all { it == 0 })
-        assertTrue(Board.getPitsForPlayer(Player.PLAYER2, newCtx.pits()).all { it == 0 })
+        assertTrue(newCtx.board().getPitsInRow(Player.PLAYER1.ordinal).all { it == 0 })
+        assertTrue(newCtx.board().getPitsInRow(Player.PLAYER2.ordinal).all { it == 0 })
     }
 
     @ParameterizedTest
     @MethodSource("pitsProvider")
     fun `should end game and move all pits to Mancalas when all pits for a player are empty`(pits: List<Int>) {
         val ctx = GamesHelper.newGameContext()
-            .withPits(pits)
+            .withBoard(Board(pits, pitsPerRow = pitsForPlayer))
             .withGameState(GameState.IN_PROGRESS)
 
         val newCtx = rule.apply(ctx)
 
-        val expectedPlayer1Score = Board.getPitsForPlayer(Player.PLAYER1, pits).sum() + player1MancalaStones
-        val expectedPlayer2Score = Board.getPitsForPlayer(Player.PLAYER2, pits).sum() + player2MancalaStones
+        val expectedPlayer1Score = ctx.board().getPitsInRow(Player.PLAYER1.ordinal).sum() + player1MancalaStones
+        val expectedPlayer2Score = ctx.board().getPitsInRow(Player.PLAYER2.ordinal).sum() + player2MancalaStones
 
-        assertEquals(expectedPlayer1Score, newCtx.getStonesInPit(newCtx.getPlayerMancalaIndex(Player.PLAYER1)))
-        assertEquals(expectedPlayer2Score, newCtx.getStonesInPit(newCtx.getPlayerMancalaIndex(Player.PLAYER2)))
+        assertEquals(expectedPlayer1Score, newCtx.board().getStones(newCtx.getPlayerMancalaIndex(Player.PLAYER1)))
+        assertEquals(expectedPlayer2Score, newCtx.board().getStones(newCtx.getPlayerMancalaIndex(Player.PLAYER2)))
     }
 
     @Test
     fun `should not end game when not all pits for a player are empty`() {
         val ctx = GamesHelper.newGameContext()
-            .withPits(gameInProgressPits)
+            .withBoard(Board(gameInProgressPits, pitsPerRow = pitsForPlayer))
             .withGameState(GameState.IN_PROGRESS)
 
         val newCtx = rule.apply(ctx)

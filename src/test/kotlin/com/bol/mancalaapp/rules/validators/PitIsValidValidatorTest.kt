@@ -16,14 +16,14 @@ class PitIsValidValidatorTest {
 
     @BeforeEach
     fun setUp() {
-        val board = Board(pits = pits)
+        val board = Board(pits = pits, pitsPerRow = 6)
         gameContext = GamesHelper.newGameContext()
         gameContext = gameContext.copy(game = gameContext.game.copy(board = board))
     }
 
     @Test
     fun `should not throw exception when pit index is valid`() {
-        val validPitIndex = (0 until gameContext.totalPits()).random()
+        val validPitIndex = (0 until gameContext.board().getTotalPits()).random()
 
         assertDoesNotThrow { PitIsValidValidator.validate(gameContext.copy(pitIdx = validPitIndex)) }
     }

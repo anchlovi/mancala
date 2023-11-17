@@ -34,21 +34,21 @@ class CaptureStonesGameRuleTest {
 
         ctx = GamesHelper.newGameContext()
             .withPlayer(Player.PLAYER1)
-            .withPits(pits)
+            .withBoard(board = Board(pits, pitsPerRow = 4))
     }
 
     @Test
     fun `should capture stones when last stone lands in an empty pit owned by the current player and the opposite pit has stones`() {
         val lastIdx = 1
-        val oppositeIdx = Board.getOppositePitIndex(ctx.totalPits(), lastIdx)
+        val oppositeIdx = ctx.board().getOppositePitIndex(lastIdx)
 
         val newCtx = rule.apply(ctx.withLastPitIdx(lastIdx))
 
         val expectedStonesInMancala = initialStonesInMancala + stonesToCapture + 1 // 1 stone from last pit
 
-        assertEquals(expectedStonesInMancala, newCtx.getStonesInPit(newCtx.getPlayerMancalaIndex()))
-        assertEquals(0, newCtx.getStonesInPit(lastIdx))
-        assertEquals(0, newCtx.getStonesInPit(oppositeIdx))
+        assertEquals(expectedStonesInMancala, newCtx.board().getStones(newCtx.getPlayerMancalaIndex()))
+        assertEquals(0, newCtx.board().getStones(lastIdx))
+        assertEquals(0, newCtx.board().getStones(oppositeIdx))
     }
 
     @Test
@@ -57,25 +57,16 @@ class CaptureStonesGameRuleTest {
 
         val newCtx = rule.apply(ctx.withLastPitIdx(lastIdx))
 
-        assertEquals(ctx.pits(), newCtx.pits())
-    }
-
-    @Test
-    fun `should capture stones when last stone lands in an empty pit owned by the current player and the opposite pit has no stones`() {
-        val lastIdx = 2
-
-        val newCtx = rule.apply(ctx.withLastPitIdx(lastIdx))
-
-        assertEquals(ctx.pits(), newCtx.pits())
+        assertEquals(ctx.board(), newCtx.board())
     }
 
     @Test
     fun `should not capture stones when last stone land in Mancala`() {
-        val lastIdx = Board.getPlayerMancalaIndex(ctx.player(), 4)
+        val lastIdx = ctx.getPlayerMancalaIndex()
 
         val newCtx = rule.apply(ctx.withLastPitIdx(lastIdx))
 
-        assertEquals(ctx.pits(), newCtx.pits())
+        assertEquals(ctx.board(), newCtx.board())
     }
 
     @Test
@@ -84,6 +75,6 @@ class CaptureStonesGameRuleTest {
 
         val newCtx = rule.apply(ctx.withLastPitIdx(lastIdx))
 
-        assertEquals(ctx.pits(), newCtx.pits())
+        assertEquals(ctx.board(), newCtx.board())
     }
 }

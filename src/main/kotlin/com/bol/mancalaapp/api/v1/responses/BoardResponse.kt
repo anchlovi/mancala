@@ -25,7 +25,7 @@ data class BoardResponse(
         fun fromBoard(board: Board): BoardResponse {
             return BoardResponse(
                 pits = board.pits,
-                pitsForPlayer = board.pitsForPlayer
+                pitsForPlayer = board.pitsPerRow
             )
         }
     }

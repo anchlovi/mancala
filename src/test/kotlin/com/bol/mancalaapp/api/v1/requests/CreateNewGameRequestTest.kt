@@ -7,13 +7,15 @@ class CreateNewGameRequestTest {
 
     @Test
     fun `should correctly convert to CreateNewGameCommand`() {
-        val numberOfPitsForPlayer = 6
-        val numberOfStonesInEachPit = 4
-        val request = CreateNewGameRequest(numberOfPitsForPlayer, numberOfStonesInEachPit)
+        val totalPlayers = 2
+        val pitsForPlayer = 6
+        val stonesPerPit = 4
+        val request = CreateNewGameRequest(totalPlayers, pitsForPlayer, stonesPerPit)
 
         val command = request.toCommand()
 
-        assertEquals(numberOfPitsForPlayer, command.numberOfPitsForPlayer)
-        assertEquals(numberOfStonesInEachPit, command.numberOfStonesInEachPit)
+        assertEquals(totalPlayers, command.totalPlayers)
+        assertEquals(pitsForPlayer, command.pitsForPlayer)
+        assertEquals(stonesPerPit, command.stonesPerPit)
     }
 }

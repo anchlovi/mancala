@@ -13,6 +13,6 @@ class BoardResponseTest {
         val response = BoardResponse.fromBoard(board)
 
         assertEquals(board.pits, response.pits)
-        assertEquals(board.pitsForPlayer, response.pitsForPlayer)
+        assertEquals(board.pitsPerRow, response.pitsForPlayer)
     }
 }

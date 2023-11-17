@@ -1,5 +1,6 @@
 package com.bol.mancalaapp.rules.validators
 
+import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.helpers.GamesHelper
 import com.bol.mancalaapp.rules.GameContext
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -15,7 +16,7 @@ class EmptyPitValidatorTest {
     fun setUp() {
         val pits = listOf(4, 0, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0)
 
-        gameContext = GamesHelper.newGameContext().withPits(pits = pits)
+        gameContext = GamesHelper.newGameContext().withBoard(board = Board(pits, pitsPerRow = 6))
     }
 
     @Test

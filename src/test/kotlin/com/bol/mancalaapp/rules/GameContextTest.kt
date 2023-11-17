@@ -34,65 +34,20 @@ class GameContextTest {
     }
 
     @Test
-    fun `should correctly return pitsForPlayer`() {
-        assertEquals(board.pitsForPlayer, gameContext.pitsForPlayer())
-    }
-
-    @Test
-    fun `should correctly return pits`() {
-        assertEquals(board.pits, gameContext.pits())
-    }
-
-    @Test
-    fun `should correctly return totalPits`() {
-        assertEquals(board.pits.size, gameContext.totalPits())
-    }
-
-    @Test
-    fun `should correctly return getStonesInPit`() {
-        val pitIdx = 2
-
-        assertEquals(board.pits[pitIdx], gameContext.getStonesInPit(pitIdx))
-    }
-
-    @Test
-    fun `should correctly return getOppositePitIndex`() {
-        val pitIdx = 2
-
-        assertEquals(Board.getOppositePitIndex(board.pits.size, pitIdx), gameContext.getOppositePitIndex(pitIdx))
-    }
-
-    @Test
     fun `should correctly return isPitOwnedByCurrentPlayer`() {
         val pitIdx = 2
 
-        assertEquals(Board.isPitOwnedByCurrentPlayer(
-            game.currentPlayer, pitIdx, board.pits.size), gameContext.isPitOwnedByCurrentPlayer(pitIdx))
-    }
-
-    @Test
-    fun `should correctly return isPitNotOwnedByCurrentPlayer`() {
-        val pitIdx = 2
-
-        assertEquals(Board.isPitOwnedByCurrentPlayer(
-            game.currentPlayer, pitIdx, board.pits.size).not(), gameContext.isPitNotOwnedByCurrentPlayer(pitIdx))
+        assertEquals(board.isPitInRow(game.currentPlayer.ordinal, pitIdx), gameContext.isPitOwnedByCurrentPlayer(pitIdx))
     }
 
     @Test
     fun `should correctly return getPlayerMancalaIndex`() {
-        assertEquals(Board.getPlayerMancalaIndex(game.currentPlayer, board.pitsForPlayer), gameContext.getPlayerMancalaIndex())
+        assertEquals(board.getRowMancalaPit(game.currentPlayer.ordinal), gameContext.getPlayerMancalaIndex())
     }
 
     @Test
     fun `should correctly return gameState`() {
         assertEquals(game.gameState, gameContext.gameState())
-    }
-
-    @Test
-    fun `should correctly return withPits`() {
-        val newPits = listOf(4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0)
-
-        assertEquals(newPits, gameContext.withPits(newPits).pits())
     }
 
     @Test
