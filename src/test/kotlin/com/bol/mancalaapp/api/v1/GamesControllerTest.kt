@@ -17,6 +17,7 @@ import com.bol.mancalaapp.usecases.play.PlayUseCase
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -85,6 +86,15 @@ class GamesControllerTest {
             .andExpect(MockMvcResultMatchers.status().isCreated)
 
         assertGameProperties(results, game)
+    }
+
+    @Test
+    fun `create should return 400 when create use case throws IllegalArgumentException`() {
+        whenever(createUseCase.createNewGame(any()))
+            .thenReturn(CompletableFuture.failedStage(IllegalArgumentException("Invalid game parameters")))
+
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame()))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
