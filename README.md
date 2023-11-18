@@ -10,7 +10,12 @@ This app uses `JOOQ`. To generate the JOOQ classes, run the following command:
 
 To start the database, run the following command
 ```sh
-docker-compose up db
+docker-compose up -d db
+```
+
+To stop the database, run the following command
+```sh
+docker-compose down db
 ```
 
 No need to run migrations, as the game application is already configured to run the migrations on startup using `Liquibase`.
@@ -26,7 +31,7 @@ Build the game using the command below:
 
 To start the game, run the following command
 ```sh
-docker-compose up -d --build
+docker-compose build --no-cache && docker-compose up -d
 ```
 
 To stop the game, run the following command
