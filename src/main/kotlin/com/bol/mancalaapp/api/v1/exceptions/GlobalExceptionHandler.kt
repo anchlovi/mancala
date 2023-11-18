@@ -46,6 +46,10 @@ class GlobalExceptionHandler {
     fun handleValidationException(e: ValidationException): ResponseEntity<ErrorResponse> =
         handleException(e, HttpStatus.BAD_REQUEST)
 
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> =
+        handleException(e, HttpStatus.BAD_REQUEST)
+
     /**
      * A private helper method to create a [ResponseEntity] with a given [Exception] and [HttpStatus].
      *

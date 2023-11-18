@@ -30,6 +30,8 @@ class PlayUseCase(
      *         If the game is not found or if there is a version conflict, the CompletionStage completes exceptionally.
      */
     fun play(cmd: PlayCommand): CompletionStage<Game> {
+        cmd.validate()
+
         return gamesRepository.findByIdAndVersion(cmd.gameId, cmd.version).thenCompose { game ->
             val updatedGameCtx = rulesEngine.apply(GameContext(game, cmd.pitIdx))
             gamesRepository.update(updatedGameCtx.game)

@@ -25,6 +25,7 @@ class CreateNewGameUseCase(
      * @return A [CompletionStage] that, when completed, returns the newly created game.
      */
     fun createNewGame(command: CreateNewGameCommand): CompletionStage<Game> {
+        command.validate();
         val game = createGame(command)
         return gamesRepository.create(game).thenApply { game }
     }

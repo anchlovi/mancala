@@ -17,6 +17,7 @@ import com.bol.mancalaapp.usecases.play.PlayUseCase
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -88,6 +89,15 @@ class GamesControllerTest {
     }
 
     @Test
+    fun `create should return 400 when create use case throws IllegalArgumentException`() {
+        whenever(createUseCase.createNewGame(any()))
+            .thenReturn(CompletableFuture.failedStage(IllegalArgumentException("Invalid game parameters")))
+
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame()))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
+    }
+
+    @Test
     fun `findGameById should return 200 and board data when board is found`() {
         whenever(findGameByIdUseCase.findGame(game.id))
             .thenReturn(CompletableFuture.completedFuture(game))
@@ -147,6 +157,17 @@ class GamesControllerTest {
             .thenReturn(CompletableFuture.failedStage(ValidationException("some failure message")))
 
         assertBadRequest(play(request))
+    }
+
+    @Test
+    fun `create should return 400 when play use case throws IllegalArgumentException`() {
+        val request = PlayRequest(1, 1)
+
+        whenever(playUseCase.play(request.toCommand(game.id)))
+            .thenReturn(CompletableFuture.failedStage(IllegalArgumentException("Invalid play parameters")))
+
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(request)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     private fun createNewGame(body: CreateNewGameRequest? = null): MvcResult {
