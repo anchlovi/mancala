@@ -1,6 +1,8 @@
 let gameSettingsFormModal;
 let gameEndModal;
 
+let showGameSettingsModal;
+
 function init() {
     gameSettingsFormModal = new bootstrap.Modal(document.getElementById('gameSettingsModal'), {
         keyboard: false
@@ -10,6 +12,9 @@ function init() {
         keyboard: false,
         backdrop: false
     });
+
+    const params = new URLSearchParams(window.location.search);
+    showGameSettingsModal = params.get('showSettings');
 }
 
 function renderBoard(game) {
@@ -124,7 +129,7 @@ function startNewGame(formData) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: formData ? JSON.stringify(formData) : undefined,
     }).then(response => {
         if (!response.ok) {
             return response.json().then(err => {
@@ -175,7 +180,11 @@ function showGameEndModal(winner) {
 }
 
 function resetGame() {
-    gameSettingsFormModal.show();
+    if (showGameSettingsModal) {
+        gameSettingsFormModal.show();
+    } else {
+        startNewGame();
+    }
 }
 
 function showErrorMessage(message) {

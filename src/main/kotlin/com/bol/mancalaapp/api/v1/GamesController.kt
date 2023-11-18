@@ -4,6 +4,7 @@ import com.bol.mancalaapp.GameId
 import com.bol.mancalaapp.api.v1.requests.CreateNewGameRequest
 import com.bol.mancalaapp.api.v1.requests.PlayRequest
 import com.bol.mancalaapp.api.v1.responses.GameResponse
+import com.bol.mancalaapp.usecases.create.CreateNewGameCommand
 import com.bol.mancalaapp.usecases.create.CreateNewGameUseCase
 import com.bol.mancalaapp.usecases.find.FindGameByIdUseCase
 import com.bol.mancalaapp.usecases.play.PlayUseCase
@@ -29,15 +30,17 @@ class GamesController(
     private val playUseCase: PlayUseCase
 ) {
     /**
-     * Endpoint for creating a new game.
+     * Endpoint for creating a new game. It allows for optional customization of the game settings.
+     * If no custom settings are provided, default settings are used.
      *
-     * @param newGameRequest The request body containing the parameters for the new game.
+     * @param newGameRequest The request body containing the optional parameters for the new game.
+     *                       If null, default game settings are used.
      * @return A [CompletionStage] with [GameResponse] representing the newly created game.
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody newGameRequest: CreateNewGameRequest): CompletionStage<GameResponse> =
-        createUseCase.createNewGame(newGameRequest.toCommand()).thenApply { GameResponse.fromGame(it) }
+    fun create(@RequestBody(required = false) newGameRequest: CreateNewGameRequest?): CompletionStage<GameResponse> =
+        createUseCase.createNewGame(newGameRequest?.toCommand() ?: CreateNewGameCommand.DefaultCommand).thenApply { GameResponse.fromGame(it) }
 
     /**
      * Endpoint for retrieving a game by its ID.

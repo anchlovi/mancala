@@ -14,4 +14,31 @@ data class CreateNewGameCommand(
     val totalPlayers: Int,
     val pitsForPlayer: Int,
     val stonesPerPit: Int
-)
+) {
+    companion object {
+        /**
+         * Default number of players in a game of Mancala.
+         */
+        const val DEFAULT_NUMBER_OF_PLAYERS = 2
+
+        /**
+         * Default number of pits for each player in a game of Mancala, excluding the Mancalas.
+         */
+        const val DEFAULT_NUMBER_OF_PITS = 6
+
+        /**
+         * Default number of stones in each regular pit at the start of a game of Mancala.
+         */
+        const val DEFAULT_NUMBER_OF_STONES = 6
+
+        /**
+         * Default request for creating a new game of Mancala.
+         * This request uses the default number of players, pits, and stones.
+         */
+        val DefaultCommand = CreateNewGameCommand(
+            totalPlayers = DEFAULT_NUMBER_OF_PLAYERS,
+            pitsForPlayer = DEFAULT_NUMBER_OF_PITS,
+            stonesPerPit = DEFAULT_NUMBER_OF_STONES
+        )
+    }
+}

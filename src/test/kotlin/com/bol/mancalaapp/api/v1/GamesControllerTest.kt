@@ -10,6 +10,7 @@ import com.bol.mancalaapp.domain.GameNotFoundException
 import com.bol.mancalaapp.domain.VersionMismatchException
 import com.bol.mancalaapp.helpers.GamesHelper
 import com.bol.mancalaapp.rules.validators.ValidationException
+import com.bol.mancalaapp.usecases.create.CreateNewGameCommand
 import com.bol.mancalaapp.usecases.create.CreateNewGameUseCase
 import com.bol.mancalaapp.usecases.find.FindGameByIdUseCase
 import com.bol.mancalaapp.usecases.play.PlayUseCase
@@ -70,6 +71,17 @@ class GamesControllerTest {
             .thenReturn(CompletableFuture.completedStage(game))
 
         val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame(request)))
+            .andExpect(MockMvcResultMatchers.status().isCreated)
+
+        assertGameProperties(results, game)
+    }
+
+    @Test
+    fun `create should return 201 when a new game is created with default settings`() {
+        whenever(createUseCase.createNewGame(CreateNewGameCommand.DefaultCommand))
+            .thenReturn(CompletableFuture.completedStage(game))
+
+        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame()))
             .andExpect(MockMvcResultMatchers.status().isCreated)
 
         assertGameProperties(results, game)
@@ -137,13 +149,16 @@ class GamesControllerTest {
         assertBadRequest(play(request))
     }
 
-    private fun createNewGame(body: CreateNewGameRequest): MvcResult {
-        return mockMvc.perform(
-            MockMvcRequestBuilders.post(GAMES_URI)
-                .contentType(MediaType.APPLICATION_JSON)
+    private fun createNewGame(body: CreateNewGameRequest? = null): MvcResult {
+        val builder = MockMvcRequestBuilders.post(GAMES_URI)
+            .characterEncoding("utf-8")
+
+        if (body != null) {
+            builder.contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body))
-                .characterEncoding("utf-8")
-        ).andReturn()
+        }
+
+        return mockMvc.perform(builder).andReturn()
     }
 
     private fun findById(gameId: GameId): MvcResult {
