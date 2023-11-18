@@ -32,6 +32,7 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.liquibase:liquibase-core")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.18.3"))

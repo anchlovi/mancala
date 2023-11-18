@@ -8,8 +8,8 @@ import com.bol.mancalaapp.usecases.create.CreateNewGameCommand
 import com.bol.mancalaapp.usecases.create.CreateNewGameUseCase
 import com.bol.mancalaapp.usecases.find.FindGameByIdUseCase
 import com.bol.mancalaapp.usecases.play.PlayUseCase
+import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.concurrent.CompletionStage
 
@@ -23,7 +23,6 @@ import java.util.concurrent.CompletionStage
  */
 @RestController
 @RequestMapping("/api/v1/games")
-@Validated
 class GamesController(
     private val createUseCase: CreateNewGameUseCase,
     private val findGameByIdUseCase: FindGameByIdUseCase,
@@ -39,6 +38,7 @@ class GamesController(
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create New Game")
     fun create(@RequestBody(required = false) newGameRequest: CreateNewGameRequest?): CompletionStage<GameResponse> =
         createUseCase.createNewGame(newGameRequest?.toCommand() ?: CreateNewGameCommand.DefaultCommand).thenApply { GameResponse.fromGame(it) }
 
@@ -49,6 +49,7 @@ class GamesController(
      * @return A [CompletionStage] with [GameResponse] representing the found game.
      */
     @GetMapping("/{gameId}")
+    @Operation(summary = "Find Game By Id")
     fun findById(@PathVariable gameId: GameId): CompletionStage<GameResponse> =
         findGameByIdUseCase.findGame(gameId).thenApply { GameResponse.fromGame(it) }
 
@@ -60,6 +61,7 @@ class GamesController(
      * @return A [CompletionStage] with [GameResponse] representing the updated state of the game after the move.
      */
     @PutMapping("/{gameId}/play")
+    @Operation(summary = "Play Move")
     fun play(@RequestBody playRequest: PlayRequest, @PathVariable gameId: GameId): CompletionStage<GameResponse> =
         playUseCase.play(playRequest.toCommand(gameId)).thenApply { GameResponse.fromGame(it) }
 }
