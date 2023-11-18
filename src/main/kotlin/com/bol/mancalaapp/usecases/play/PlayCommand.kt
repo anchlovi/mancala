@@ -11,12 +11,18 @@ import com.bol.mancalaapp.GameId
  * @property gameId The unique identifier of the game in which the move is to be played.
  * @property pitIdx The index of the pit from which the stones will be played.
  *                  It represents the player's choice of pit to play their turn.
+ *                  Must be a positive integer.
  * @property version The version of the game at the time when the move is initiated.
  *                   Used for implementing optimistic locking to handle concurrent game updates.
+ *                   Must be a positive integer.
  */
 data class PlayCommand(
     val gameId: GameId,
     val pitIdx: Int,
     val version: Int
-)
-
+) {
+    fun validate() {
+        require(pitIdx >= 0) { "Pit index (pitIdx) must be non-negative" }
+        require(version >= 0) { "Version must be non-negative" }
+    }
+}

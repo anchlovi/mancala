@@ -159,6 +159,17 @@ class GamesControllerTest {
         assertBadRequest(play(request))
     }
 
+    @Test
+    fun `create should return 400 when play use case throws IllegalArgumentException`() {
+        val request = PlayRequest(1, 1)
+
+        whenever(playUseCase.play(request.toCommand(game.id)))
+            .thenReturn(CompletableFuture.failedStage(IllegalArgumentException("Invalid play parameters")))
+
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(request)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
+    }
+
     private fun createNewGame(body: CreateNewGameRequest? = null): MvcResult {
         val builder = MockMvcRequestBuilders.post(GAMES_URI)
             .characterEncoding("utf-8")

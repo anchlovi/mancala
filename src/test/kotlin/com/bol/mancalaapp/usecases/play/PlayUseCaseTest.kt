@@ -57,4 +57,11 @@ class PlayUseCaseTest {
             useCase.play(PlayCommand(unknownGameId, pitIndex, game.version)).asDeferred().await()
         }
     }
+
+    @Test
+    fun `should call validate on command`(): Unit = runBlocking {
+        assertThrows<IllegalArgumentException> {
+            useCase.play(PlayCommand(game.id, -1, game.version)).asDeferred().await()
+        }
+    }
 }
