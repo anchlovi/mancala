@@ -30,9 +30,9 @@ object GameOverGameRule : GameRule {
 
     private fun isGameOver(ctx: GameContext) =
         (0 until ctx.game.totalPlayers)
-            .map { ctx.board().getPitsInRow(it).all { p -> p == 0 } }
-            .filter { it }
-            .size >= ctx.game.totalPlayers - 1
+            .map { ctx.board().getPitsInRow(it).sum() }
+            .filter { it > 0}
+            .size == 1 // only one player has stones left
 
     private fun determineWinner(board: Board, totalPlayers: Int): Int? {
         val scores = (0 until totalPlayers).associateWith {
