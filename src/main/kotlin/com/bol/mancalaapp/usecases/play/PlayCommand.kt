@@ -21,6 +21,11 @@ data class PlayCommand(
     val pitIdx: Int,
     val version: Int
 ) {
+    /**
+     * Validates the command to ensure it is valid.
+     *
+     * @throws IllegalArgumentException If the command is not valid.
+     */
     fun validate() {
         require(pitIdx >= 0) { "Pit index (pitIdx) must be non-negative" }
         require(version >= 0) { "Version must be non-negative" }
