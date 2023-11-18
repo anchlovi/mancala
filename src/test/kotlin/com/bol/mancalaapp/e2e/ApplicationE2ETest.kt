@@ -36,7 +36,7 @@ class ApplicationE2ETest {
 
     @Test
     fun `run 2 players with 3 pits each and 2 stones in each pit`() {
-        val scenario = mapper.readValue(loadScenario("game_2_3_3"), Scenario::class.java)
+        val scenario = mapper.readValue(loadScenario("game_2_3_2"), Scenario::class.java)
 
         val game = createGame(scenario)
 
@@ -67,10 +67,9 @@ class ApplicationE2ETest {
 
     private fun play(game: GameResponse, step: GameStep): GameResponse {
         val playResponse = restTemplate.exchange(
-            "http://localhost:$port/api/v1/games",
+            "http://localhost:$port/api/v1/games/${game.id}/play",
             HttpMethod.PUT,
             HttpEntity(PlayRequest(
-                gameId = game.id,
                 pitIndex = step.pitIndex,
                 version = game.version
             )),
