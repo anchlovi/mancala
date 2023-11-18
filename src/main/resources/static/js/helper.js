@@ -93,13 +93,12 @@ function appendBlinkingDot(cell) {
 }
 
 function makePitMove(game, pitIndex) {
-    fetch('/api/v1/games', {
+    fetch(`/api/v1/games/${game.id}/play`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            game_id: game.id,
             pit_index: pitIndex,
             version: game.version,
         }),

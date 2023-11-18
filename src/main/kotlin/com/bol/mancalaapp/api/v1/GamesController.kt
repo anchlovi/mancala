@@ -52,10 +52,11 @@ class GamesController(
     /**
      * Endpoint for playing a move in a game.
      *
+     * @param gameId The unique identifier of the game to be updated.
      * @param playRequest The request body containing the parameters for the move.
      * @return A [CompletionStage] with [GameResponse] representing the updated state of the game after the move.
      */
-    @PutMapping
-    fun play(@RequestBody playRequest: PlayRequest): CompletionStage<GameResponse> =
-        playUseCase.play(playRequest.toCommand()).thenApply { GameResponse.fromGame(it) }
+    @PutMapping("/{gameId}/play")
+    fun play(@RequestBody playRequest: PlayRequest, @PathVariable gameId: GameId): CompletionStage<GameResponse> =
+        playUseCase.play(playRequest.toCommand(gameId)).thenApply { GameResponse.fromGame(it) }
 }

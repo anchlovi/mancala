@@ -12,9 +12,9 @@ class PlayRequestTest {
         val gameId = GameId.randomUUID()
         val pitIndex = 1
         val version = 0
-        val playRequest = PlayRequest(gameId, pitIndex, version)
+        val playRequest = PlayRequest(pitIndex, version)
 
-        val playCommand = playRequest.toCommand()
+        val playCommand = playRequest.toCommand(gameId)
 
         assertEquals(PlayCommand(gameId, pitIndex, version), playCommand)
     }

@@ -96,9 +96,9 @@ class GamesControllerTest {
 
     @Test
     fun `play should return 200 when move is valid`() {
-        val request = PlayRequest(game.id, 1, game.version)
+        val request = PlayRequest(1, game.version)
 
-        whenever(playUseCase.play(request.toCommand()))
+        whenever(playUseCase.play(request.toCommand(game.id)))
             .thenReturn(CompletableFuture.completedStage(game))
 
         val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(request)))
@@ -109,19 +109,19 @@ class GamesControllerTest {
 
     @Test
     fun `play should return 404 when game is not found`() {
-        val request = PlayRequest(game.id, 1, 1)
+        val request = PlayRequest(1, 1)
 
-        whenever(playUseCase.play(request.toCommand()))
-            .thenReturn(CompletableFuture.failedStage(GameNotFoundException(request.gameId)))
+        whenever(playUseCase.play(request.toCommand(game.id)))
+            .thenReturn(CompletableFuture.failedStage(GameNotFoundException(game.id)))
 
-        assertGameWasNotFound(play(request), request.gameId)
+        assertGameWasNotFound(play(request), game.id)
     }
 
     @Test
     fun `play should return 429 on game version conflicts`() {
-        val request = PlayRequest(game.id, 1, 1)
+        val request = PlayRequest(1, 1)
 
-        whenever(playUseCase.play(request.toCommand()))
+        whenever(playUseCase.play(request.toCommand(game.id)))
             .thenReturn(CompletableFuture.failedStage(VersionMismatchException()))
 
         assertVersionMismatch(play(request))
@@ -129,9 +129,9 @@ class GamesControllerTest {
 
     @Test
     fun `play should return 400 on invalid move`() {
-        val request = PlayRequest(game.id, 1, 1)
+        val request = PlayRequest(1, 1)
 
-        whenever(playUseCase.play(request.toCommand()))
+        whenever(playUseCase.play(request.toCommand(game.id)))
             .thenReturn(CompletableFuture.failedStage(ValidationException("some failure message")))
 
         assertBadRequest(play(request))
@@ -152,7 +152,7 @@ class GamesControllerTest {
 
     private fun play(body: PlayRequest): MvcResult =
         mockMvc.perform(
-            MockMvcRequestBuilders.put(GAMES_URI)
+            MockMvcRequestBuilders.put("$GAMES_URI/${game.id}/play")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body))
                 .characterEncoding("utf-8")
