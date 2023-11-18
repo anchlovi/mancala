@@ -44,7 +44,7 @@
   }, {
     "pit_index": 2,
     "expected_response": {
-      "current_player": 1,
+      "current_player": 0,
       "pits": [0, 0, 0, 2, 0, 0, 0, 10],
       "game_state": "GAME_OVER",
       "version": 5,

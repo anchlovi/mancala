@@ -24,8 +24,8 @@ class RulesEngineContextTest {
         val expectedRulesOrder = listOf(
             DistributeStonesGameRule::class.java,
             CaptureStonesGameRule::class.java,
-            DetermineNextPlayerGameRule::class.java,
-            GameOverGameRule::class.java
+            GameOverGameRule::class.java,
+            DetermineNextPlayerGameRule::class.java
         )
 
         assertEquals(expectedRulesOrder, rules.map { it::class.java })
