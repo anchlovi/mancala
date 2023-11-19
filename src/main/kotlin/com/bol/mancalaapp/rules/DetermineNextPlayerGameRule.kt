@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
  * Otherwise, the turn passes to the next player who has stones to play.
  */
 @Component
-@Order(40)
+@Order(60)
 object DetermineNextPlayerGameRule : GameRule {
     override fun apply(ctx: GameContext): GameContext {
         if (ctx.game.gameState.isGameOver) {
