@@ -27,12 +27,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.util.concurrent.CompletableFuture
 
 @WebMvcTest(GamesController::class)
 @AutoConfigureMockMvc
@@ -69,9 +66,9 @@ class GamesControllerTest {
         )
 
         whenever(createUseCase.createNewGame(request.toCommand()))
-            .thenReturn(CompletableFuture.completedStage(game))
+            .thenReturn(game)
 
-        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame(request)))
+        val results = createNewGame(request)
             .andExpect(MockMvcResultMatchers.status().isCreated)
 
         assertGameProperties(results, game)
@@ -80,9 +77,9 @@ class GamesControllerTest {
     @Test
     fun `create should return 201 when a new game is created with default settings`() {
         whenever(createUseCase.createNewGame(CreateNewGameCommand.DefaultCommand))
-            .thenReturn(CompletableFuture.completedStage(game))
+            .thenReturn(game)
 
-        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame()))
+        val results = createNewGame()
             .andExpect(MockMvcResultMatchers.status().isCreated)
 
         assertGameProperties(results, game)
@@ -91,18 +88,18 @@ class GamesControllerTest {
     @Test
     fun `create should return 400 when create use case throws IllegalArgumentException`() {
         whenever(createUseCase.createNewGame(any()))
-            .thenReturn(CompletableFuture.failedStage(IllegalArgumentException("Invalid game parameters")))
+            .thenThrow(IllegalArgumentException("Invalid game parameters"))
 
-        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(createNewGame()))
+        createNewGame()
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
     fun `findGameById should return 200 and board data when board is found`() {
         whenever(findGameByIdUseCase.findGame(game.id))
-            .thenReturn(CompletableFuture.completedFuture(game))
+            .thenReturn(game)
 
-        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(findById(game.id)))
+        val results = findById(game.id)
             .andExpect(MockMvcResultMatchers.status().isOk)
 
         assertGameProperties(results, game)
@@ -111,7 +108,7 @@ class GamesControllerTest {
     @Test
     fun `findById should return 404 when game is not found`() {
         whenever(findGameByIdUseCase.findGame(game.id))
-            .thenReturn(CompletableFuture.failedStage(GameNotFoundException(game.id)))
+            .thenThrow(GameNotFoundException(game.id))
 
         assertGameWasNotFound(findById(game.id), game.id)
     }
@@ -121,9 +118,9 @@ class GamesControllerTest {
         val request = PlayRequest(1, game.version)
 
         whenever(playUseCase.play(request.toCommand(game.id)))
-            .thenReturn(CompletableFuture.completedStage(game))
+            .thenReturn(game)
 
-        val results = mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(request)))
+        val results = play(request)
             .andExpect(MockMvcResultMatchers.status().isOk)
 
         assertGameProperties(results, game)
@@ -134,7 +131,7 @@ class GamesControllerTest {
         val request = PlayRequest(1, 1)
 
         whenever(playUseCase.play(request.toCommand(game.id)))
-            .thenReturn(CompletableFuture.failedStage(GameNotFoundException(game.id)))
+            .thenThrow(GameNotFoundException(game.id))
 
         assertGameWasNotFound(play(request), game.id)
     }
@@ -144,7 +141,7 @@ class GamesControllerTest {
         val request = PlayRequest(1, 1)
 
         whenever(playUseCase.play(request.toCommand(game.id)))
-            .thenReturn(CompletableFuture.failedStage(VersionMismatchException()))
+            .thenThrow(VersionMismatchException())
 
         assertVersionMismatch(play(request))
     }
@@ -154,7 +151,7 @@ class GamesControllerTest {
         val request = PlayRequest(1, 1)
 
         whenever(playUseCase.play(request.toCommand(game.id)))
-            .thenReturn(CompletableFuture.failedStage(ValidationException("some failure message")))
+            .thenThrow(ValidationException("some failure message"))
 
         assertBadRequest(play(request))
     }
@@ -164,13 +161,13 @@ class GamesControllerTest {
         val request = PlayRequest(1, 1)
 
         whenever(playUseCase.play(request.toCommand(game.id)))
-            .thenReturn(CompletableFuture.failedStage(IllegalArgumentException("Invalid play parameters")))
+            .thenThrow(IllegalArgumentException("Invalid play parameters"))
 
-        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(play(request)))
+        play(request)
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
-    private fun createNewGame(body: CreateNewGameRequest? = null): MvcResult {
+    private fun createNewGame(body: CreateNewGameRequest? = null): ResultActions {
         val builder = MockMvcRequestBuilders.post(GAMES_URI)
             .characterEncoding("utf-8")
 
@@ -179,24 +176,26 @@ class GamesControllerTest {
                 .content(objectMapper.writeValueAsString(body))
         }
 
-        return mockMvc.perform(builder).andReturn()
+        return mockMvc.perform(builder)
     }
 
-    private fun findById(gameId: GameId): MvcResult {
-        return mockMvc.get("${GAMES_URI}/${gameId}").andReturn()
-    }
+    private fun findById(gameId: GameId): ResultActions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("$GAMES_URI/${gameId}")
+                .characterEncoding("utf-8")
+        )
 
-    private fun play(body: PlayRequest): MvcResult =
+    private fun play(body: PlayRequest): ResultActions =
         mockMvc.perform(
             MockMvcRequestBuilders.put("$GAMES_URI/${game.id}/play")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body))
                 .characterEncoding("utf-8")
-        ).andReturn()
+        )
 
-    private fun assertGameWasNotFound(mvcResult: MvcResult, gameId: GameId) =
+    private fun assertGameWasNotFound(result: ResultActions, gameId: GameId) =
         assertError(
-            mvcResult = mvcResult,
+            result = result,
             expectedStatus = HttpStatus.NOT_FOUND,
             expectedError = ErrorResponse(
                 type = GameNotFoundException::class.qualifiedName,
@@ -204,9 +203,9 @@ class GamesControllerTest {
             )
         )
 
-    private fun assertVersionMismatch(mvcResult: MvcResult) =
+    private fun assertVersionMismatch(result: ResultActions) =
         assertError(
-            mvcResult = mvcResult,
+            result = result,
             expectedStatus = HttpStatus.CONFLICT,
             expectedError = ErrorResponse(
                 type = VersionMismatchException::class.qualifiedName,
@@ -214,9 +213,9 @@ class GamesControllerTest {
             )
         )
 
-    private fun assertBadRequest(mvcResult: MvcResult) =
+    private fun assertBadRequest(result: ResultActions) =
         assertError(
-            mvcResult = mvcResult,
+            result = result,
             expectedStatus = HttpStatus.BAD_REQUEST,
             expectedError = ErrorResponse(
                 type = ValidationException::class.qualifiedName,
@@ -224,8 +223,8 @@ class GamesControllerTest {
             )
         )
 
-    private fun assertError(mvcResult: MvcResult, expectedStatus: HttpStatus, expectedError: ErrorResponse) {
-        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(mvcResult))
+    private fun assertError(result: ResultActions, expectedStatus: HttpStatus, expectedError: ErrorResponse) {
+        result
             .andExpect(MockMvcResultMatchers.status().`is`(expectedStatus.value()))
             .andExpectAll(
                 MockMvcResultMatchers.jsonPath("$.type").value(expectedError.type),

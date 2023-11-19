@@ -6,7 +6,6 @@ import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GameState
 import com.bol.mancalaapp.domain.GamesRepository
 import org.springframework.stereotype.Service
-import java.util.concurrent.CompletionStage
 
 /**
  * Service class responsible for handling the creation of a new Mancala game.
@@ -22,12 +21,14 @@ class CreateNewGameUseCase(
      * Creates a new game based on the specified command and persists it in the repository.
      *
      * @param command The command containing the settings for the new game.
-     * @return A [CompletionStage] that, when completed, returns the newly created game.
+     * @return The newly created [Game].
      */
-    fun createNewGame(command: CreateNewGameCommand): CompletionStage<Game> {
+    fun createNewGame(command: CreateNewGameCommand): Game {
         command.validate();
         val game = createGame(command)
-        return gamesRepository.create(game).thenApply { game }
+        gamesRepository.create(game)
+
+        return game
     }
 
     /**

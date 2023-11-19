@@ -5,7 +5,6 @@ import com.bol.mancalaapp.domain.GamesRepository
 import com.bol.mancalaapp.rules.GameContext
 import com.bol.mancalaapp.rules.RulesEngine
 import org.springframework.stereotype.Service
-import java.util.concurrent.CompletionStage
 
 /**
  * Service class responsible for handling a play action in a Mancala game.
@@ -26,15 +25,18 @@ class PlayUseCase(
      * and updates the game with the new state. It employs optimistic locking using the game version for concurrency control.
      *
      * @param cmd The command containing the details of the play action (game ID, pit index, and game version).
-     * @return A [CompletionStage] that, when completed, returns the updated game state.
-     *         If the game is not found or if there is a version conflict, the CompletionStage completes exceptionally.
+     * @return The updated [Game] state.
+     *
+     * @throws com.bol.mancalaapp.domain.GameNotFoundException If no game is found with the provided identifier and version.
+     * @throws com.bol.mancalaapp.domain.VersionMismatchException If there is a version conflict during the update.
+     * @throws com.bol.mancalaapp.rules.validators.ValidationException If the player move fails validation.
      */
-    fun play(cmd: PlayCommand): CompletionStage<Game> {
+    fun play(cmd: PlayCommand): Game {
         cmd.validate()
 
-        return gamesRepository.findByIdAndVersion(cmd.gameId, cmd.version).thenCompose { game ->
-            val updatedGameCtx = rulesEngine.apply(GameContext(game, cmd.pitIdx))
-            gamesRepository.update(updatedGameCtx.game)
-        }
+        val game = gamesRepository.findByIdAndVersion(cmd.gameId, cmd.version)
+        val ctx = rulesEngine.apply(GameContext(game, cmd.pitIdx))
+
+        return gamesRepository.update(ctx.game)
     }
 }

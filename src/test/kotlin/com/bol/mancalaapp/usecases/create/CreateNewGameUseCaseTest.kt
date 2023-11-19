@@ -2,7 +2,6 @@ package com.bol.mancalaapp.usecases.create
 
 import com.bol.mancalaapp.domain.Board
 import com.bol.mancalaapp.domain.impl.InMemoryGamesRepository
-import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -14,10 +13,10 @@ class CreateNewGameUseCaseTest {
     private val useCase = CreateNewGameUseCase(gamesRepository)
 
     @Test
-    fun `should create new game`(): Unit = runBlocking {
+    fun `should create new game`() {
         val command = CreateNewGameCommand(2,6, 4)
 
-        val game = useCase.createNewGame(command).asDeferred().await()
+        val game = useCase.createNewGame(command)
 
         val expectedGame = Board.createBoard(command.totalPlayers, command.pitsForPlayer, command.stonesPerPit)
 

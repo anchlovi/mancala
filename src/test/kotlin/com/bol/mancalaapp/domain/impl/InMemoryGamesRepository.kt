@@ -5,25 +5,22 @@ import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GameNotFoundException
 import com.bol.mancalaapp.domain.GamesRepository
 import com.bol.mancalaapp.domain.VersionMismatchException
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionStage
 import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryGamesRepository : GamesRepository {
 
     private val games = ConcurrentHashMap<GameId, Game>()
 
-    override fun create(game: Game): CompletionStage<GameId> {
+    override fun create(game: Game): GameId {
         games[game.id] = game
-        return CompletableFuture.completedFuture(game.id)
+        return game.id
     }
 
-    override fun findById(id: GameId): CompletionStage<Game> {
-        val game = games[id] ?: throw GameNotFoundException(id)
-        return CompletableFuture.completedFuture(game)
+    override fun findById(id: GameId): Game {
+        return games[id] ?: throw GameNotFoundException(id)
     }
 
-    override fun update(game: Game): CompletionStage<Game> {
+    override fun update(game: Game): Game {
         val existingGame = games[game.id]
             ?: throw GameNotFoundException(game.id)
 
@@ -32,10 +29,10 @@ class InMemoryGamesRepository : GamesRepository {
         }
 
         games[game.id] = game.copy(version = game.version + 1)
-        return CompletableFuture.completedFuture(games[game.id])
+        return games[game.id]!!
     }
 
-    override fun findByIdAndVersion(id: GameId, version: Int): CompletionStage<Game> {
+    override fun findByIdAndVersion(id: GameId, version: Int): Game {
         val game = games[id]
             ?: throw GameNotFoundException(id)
 
@@ -43,6 +40,6 @@ class InMemoryGamesRepository : GamesRepository {
             throw GameNotFoundException(id)
         }
 
-        return CompletableFuture.completedFuture(game)
+        return game
     }
 }
