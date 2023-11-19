@@ -25,6 +25,8 @@ class RulesEngineContextTest {
             DistributeStonesGameRule::class.java,
             CaptureStonesGameRule::class.java,
             GameOverGameRule::class.java,
+            CollectFreeStonesGameRule::class.java,
+            DetermineWinnerGameRule::class.java,
             DetermineNextPlayerGameRule::class.java
         )
 
