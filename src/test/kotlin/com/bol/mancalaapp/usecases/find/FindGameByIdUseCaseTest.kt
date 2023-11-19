@@ -6,8 +6,6 @@ import com.bol.mancalaapp.domain.GameNotFoundException
 import com.bol.mancalaapp.domain.GamesRepository
 import com.bol.mancalaapp.domain.impl.InMemoryGamesRepository
 import com.bol.mancalaapp.helpers.GamesHelper
-import kotlinx.coroutines.future.asDeferred
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,17 +29,17 @@ class FindGameByIdUseCaseTest {
     }
 
     @Test
-    fun `findGame should retrieve the correct game`(): Unit = runBlocking {
-        val retrievedGame = useCase.findGame(game.id).asDeferred().await()
+    fun `findGame should retrieve the correct game`() {
+        val retrievedGame = useCase.findGame(game.id)
         assertEquals(game, retrievedGame)
     }
 
     @Test
-    fun `findGame should throw GameNotFoundException for unknown id`(): Unit = runBlocking {
+    fun `findGame should throw GameNotFoundException for unknown id`() {
         val unknownId = GameId.randomUUID()
 
         assertThrows<GameNotFoundException> {
-            useCase.findGame(unknownId).asDeferred().await()
+            useCase.findGame(unknownId)
         }
     }
 }

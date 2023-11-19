@@ -11,7 +11,6 @@ import com.bol.mancalaapp.usecases.play.PlayUseCase
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import java.util.concurrent.CompletionStage
 
 /**
  * REST controller for managing game-related actions in the Mancala game application.
@@ -34,34 +33,37 @@ class GamesController(
      *
      * @param newGameRequest The request body containing the optional parameters for the new game.
      *                       If null, default game settings are used.
-     * @return A [CompletionStage] with [GameResponse] representing the newly created game.
+     * @return A [GameResponse] representing the newly created game.
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create New Game")
-    fun create(@RequestBody(required = false) newGameRequest: CreateNewGameRequest?): CompletionStage<GameResponse> =
-        createUseCase.createNewGame(newGameRequest?.toCommand() ?: CreateNewGameCommand.DefaultCommand).thenApply { GameResponse.fromGame(it) }
+    fun create(@RequestBody(required = false) newGameRequest: CreateNewGameRequest?): GameResponse {
+        val command = newGameRequest?.toCommand() ?: CreateNewGameCommand.DefaultCommand
+        val game = createUseCase.createNewGame(command)
+        return GameResponse.fromGame(game)
+    }
 
     /**
      * Endpoint for retrieving a game by its ID.
      *
      * @param gameId The unique identifier of the game to be retrieved.
-     * @return A [CompletionStage] with [GameResponse] representing the found game.
+     * @return A [GameResponse] representing the found game.
      */
     @GetMapping("/{gameId}")
     @Operation(summary = "Find Game By Id")
-    fun findById(@PathVariable gameId: GameId): CompletionStage<GameResponse> =
-        findGameByIdUseCase.findGame(gameId).thenApply { GameResponse.fromGame(it) }
+    fun findById(@PathVariable gameId: GameId): GameResponse =
+        GameResponse.fromGame(findGameByIdUseCase.findGame(gameId))
 
     /**
      * Endpoint for playing a move in a game.
      *
      * @param gameId The unique identifier of the game to be updated.
      * @param playRequest The request body containing the parameters for the move.
-     * @return A [CompletionStage] with [GameResponse] representing the updated state of the game after the move.
+     * @return A [GameResponse] representing the updated state of the game after the move.
      */
     @PutMapping("/{gameId}/play")
     @Operation(summary = "Play Move")
-    fun play(@RequestBody playRequest: PlayRequest, @PathVariable gameId: GameId): CompletionStage<GameResponse> =
-        playUseCase.play(playRequest.toCommand(gameId)).thenApply { GameResponse.fromGame(it) }
+    fun play(@RequestBody playRequest: PlayRequest, @PathVariable gameId: GameId): GameResponse =
+        GameResponse.fromGame(playUseCase.play(playRequest.toCommand(gameId)))
 }

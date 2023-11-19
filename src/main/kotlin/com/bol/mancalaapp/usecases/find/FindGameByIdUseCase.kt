@@ -4,7 +4,6 @@ import com.bol.mancalaapp.GameId
 import com.bol.mancalaapp.domain.Game
 import com.bol.mancalaapp.domain.GamesRepository
 import org.springframework.stereotype.Service
-import java.util.concurrent.CompletionStage
 
 /**
  * Service class for retrieving game data based on a game identifier.
@@ -20,8 +19,8 @@ class FindGameByIdUseCase(
      * Retrieves a game from the repository based on its unique identifier.
      *
      * @param gameId The unique identifier of the game to retrieve.
-     * @return A [CompletionStage] that, when completed, returns the requested game.
-     *         If the game is not found, the CompletionStage completes exceptionally with [GameNotFoundException].
+     * @return The requested [Game].
+     * @throws com.bol.mancalaapp.domain.GameNotFoundException If no game is found with the provided identifier.
      */
-    fun findGame(gameId: GameId): CompletionStage<Game> = gamesRepository.findById(gameId)
+    fun findGame(gameId: GameId): Game = gamesRepository.findById(gameId)
 }

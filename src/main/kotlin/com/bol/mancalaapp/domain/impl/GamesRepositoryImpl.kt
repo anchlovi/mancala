@@ -11,8 +11,6 @@ import org.jooq.JSON.json
 import org.jooq.generated.tables.Games.GAMES
 import org.jooq.generated.tables.records.GamesRecord
 import org.springframework.stereotype.Repository
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionStage
 
 /**
  * A PostgreSQL implementation of the GamesRepository for managing game data in a relational database.
@@ -27,70 +25,58 @@ class GamesRepositoryImpl(
     private val dslContext: DSLContext,
     private val mapper: ObjectMapper
 ): GamesRepository {
-    override fun create(game: Game): CompletionStage<GameId> {
-        val fut = dslContext.insertInto(
+    override fun create(game: Game): GameId {
+        dslContext.insertInto(
             GAMES
         ).values(
             game.id,
             0,
             mapper.writeValueAsString(game)
-        ).executeAsync()
+        ).execute()
 
-        return fut.thenApply {
-            game.id
-        }
+        return game.id
     }
 
-    override fun findById(id: GameId): CompletionStage<Game> {
-        val records = dslContext
+    override fun findById(id: GameId): Game {
+        val record = dslContext
             .selectFrom(GAMES)
             .where(GAMES.ID.eq(id))
-            .limit(1).fetchAsync()
+            .fetchOne()
 
-        return records.thenApply {
-            when {
-                it.isNotEmpty -> mapRecordToGame(it[0])
-                else -> throw GameNotFoundException(id)
-            }
-        }
+        return record?.let { mapRecordToGame(it) }
+            ?: throw GameNotFoundException(id)
     }
 
-    override fun update(game: Game): CompletionStage<Game> {
+    override fun update(game: Game): Game {
         val gameWithUpdatedVersion = incrementVersion(game)
 
-        return dslContext.update(GAMES)
+        val updateCount = dslContext.update(GAMES)
             .set(GAMES.VERSION, gameWithUpdatedVersion.version)
             .set(GAMES.DATA, json(mapper.writeValueAsString(gameWithUpdatedVersion)))
             .where(GAMES.ID.eq(game.id))
             .and(GAMES.VERSION.eq(game.version))
-            .executeAsync()
-            .thenCompose { updateCount ->
-                when (updateCount) {
-                    1 -> CompletableFuture.completedFuture(gameWithUpdatedVersion)
-                    else -> checkAndUpdateFailureReason(game)
-                }
-            }
+            .execute()
+
+        return when (updateCount) {
+            1 -> gameWithUpdatedVersion
+            else -> checkAndUpdateFailureReason(game)
+        }
     }
 
-    override fun findByIdAndVersion(id: GameId, version: Int): CompletionStage<Game> {
-        val records = dslContext
+    override fun findByIdAndVersion(id: GameId, version: Int): Game {
+        val record = dslContext
             .selectFrom(GAMES)
             .where(GAMES.ID.eq(id))
             .and(GAMES.VERSION.eq(version))
-            .limit(1).fetchAsync()
+            .fetchOne()
 
-        return records.thenApply {
-            when {
-                it.isNotEmpty -> mapRecordToGame(it[0])
-                else -> throw GameNotFoundException(id)
-            }
-        }
+        return record?.let { mapRecordToGame(it) }
+            ?: throw GameNotFoundException(id)
     }
 
-    private fun checkAndUpdateFailureReason(game: Game): CompletionStage<Game> {
-        return findById(game.id).thenCompose {
-            CompletableFuture.failedFuture(VersionMismatchException())
-        }
+    private fun checkAndUpdateFailureReason(game: Game):Game {
+        findById(game.id)
+        throw VersionMismatchException()
     }
 
     private fun mapRecordToGame(record: GamesRecord?): Game? =

@@ -1,7 +1,6 @@
 package com.bol.mancalaapp.domain
 
 import com.bol.mancalaapp.GameId
-import java.util.concurrent.CompletionStage
 
 /**
  * Interface for the repository managing the persistence of game data in the Mancala game.
@@ -14,28 +13,28 @@ interface GamesRepository {
      * Persists a new game in the repository.
      *
      * @param game The game object to be created and persisted.
-     * @return A [CompletionStage] that, when completed, provides the unique identifier of the newly created game.
+     * @return The unique identifier of the newly created game.
      */
-    fun create(game: Game): CompletionStage<GameId>
+    fun create(game: Game): GameId
 
     /**
      * Retrieves a game by its unique identifier.
      *
      * @param id The unique identifier of the game to be retrieved.
-     * @return A [CompletionStage] that, when completed, provides the requested game.
+     * @return The requested [Game].
      * @throws GameNotFoundException If no game is found with the provided identifier.
      */
-    fun findById(id: GameId): CompletionStage<Game>
+    fun findById(id: GameId): Game
 
     /**
      * Updates an existing game in the repository.
      *
      * @param game The game object with updated information to be persisted.
-     * @return A [CompletionStage] that, when completed, provides the updated game.
+     * @return The updated [Game].
      * @throws GameNotFoundException If no game is found with the provided game identifier.
      * @throws VersionMismatchException If there is a version conflict during the update.
      */
-    fun update(game: Game): CompletionStage<Game>
+    fun update(game: Game): Game
 
     /**
      * Retrieves a game by its unique identifier and version number from the repository.
@@ -46,9 +45,9 @@ interface GamesRepository {
      *
      * @param id The unique identifier of the game to be retrieved.
      * @param version The version number of the game to be matched.
-     * @return A [CompletionStage] that, when completed, provides the requested game.
+     * @return The requested [Game].
      * @throws GameNotFoundException If no game is found with the provided identifier and version.
      */
-    fun findByIdAndVersion(id: GameId, version: Int): CompletionStage<Game>
+    fun findByIdAndVersion(id: GameId, version: Int): Game
 }
 
