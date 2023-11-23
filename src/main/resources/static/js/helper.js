@@ -170,7 +170,7 @@ function triggerConfetti() {
 }
 
 function showGameEndModal(winner) {
-    const message = winner ? `Winner: Player ${winner + 1} 🎉` : "It's a draw!";
+    const message = (winner !== undefined && winner != null) ? `Winner: Player ${winner + 1} 🎉` : "It's a draw!";
     const modal = document.getElementById('gameEndMessage') ;
     modal.textContent = message;
 
